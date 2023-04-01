@@ -1,6 +1,3 @@
-from tkinter.ttk import setup_master
-from turtle import color
-from sklearn.model_selection import PredefinedSplit
 import streamlit as st
 # UTILITY
 import joblib
@@ -9,11 +6,9 @@ from joblib import load
 # NLP
 import re
 import nltk
-from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk import SnowballStemmer
 from gensim.models.doc2vec import Doc2Vec
-import numpy as np
 import warnings
 
 warnings.filterwarnings('ignore')
