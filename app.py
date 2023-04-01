@@ -13,10 +13,7 @@ import warnings
 
 warnings.filterwarnings('ignore')
 comment = ""
-tresh1 = 0.500
-tresh2 = 0.937
-tresh3 = 0.999
-
+thresh = 0.5
 
 # set page setting
 st.set_page_config(page_title='Toxic Comments')
@@ -91,7 +88,7 @@ def probs_to_prediction(probs, threshold):
 
 
 # PROCESSING
-def compute(comment, tresh):
+def compute(comment, thresh):
     global preds
     global probs
     global stems
@@ -106,6 +103,13 @@ def compute(comment, tresh):
     normComment = normalizer.transform([vectorizedComment])
     probs = classifier.predict_proba(normComment)
     val = probs[0][1]
+    pred = 0
+    
+    if val>=thresh:
+        pred = 1
+    else:
+        pred = 0
+
     message = ""
     if 0<=val<0.2:
         message += "This comment is friendly, respectful, and free of harmful language or intent."
@@ -118,43 +122,26 @@ def compute(comment, tresh):
     else:
         message += "This comment contains highly harmful language or intent that is deeply offensive or disturbing to readers, and may even incite hatred or violence."
 
-    st.write(f"{message}")
+    st.write(f"Predicted Class: {'Toxic' if pred==1 else 'Non Toxic'}")
+    st.write(f"Message: {message}")
 
     st.markdown("""---""") 
-    # display()
     return None
 
-def display():
-    with st.container():
-        st.write("#### Different classification outputs at different threshold values:")
-        col3, col4, col5 = st.columns(3)
-        col3.metric("", "TOXIC" if preds[0]==1 else "NON TOXIC", delta = 0.500)
-        col4.metric("", "TOXIC" if preds[1]==1 else "NON TOXIC", delta = 0.937)
-        col5.metric("", "TOXIC" if preds[2]==1 else "NON TOXIC", delta = 0.999)
-    st.markdown("""---""")
-    with st.container():
-        st.write("#### Result of the NLP Pipeline:")
-        st.write(stems)
-    return None
 
 # TITLE
 st.write("# ☢️ Toxic Comments Classification")
 
 st.write("\n")
+
+# with st.form("my-slider"):
+thresh = st.slider('Set the Threshold, default 0.5', 0.000, 1.000, step=0.0001, value=0.500)
+
 with st.form("my_form",clear_on_submit=True):
     comment = st.text_input(label='Enter your comment:')
-    thresh = st.slider('Set the Threshold, default 0.5', 0.000, 1.000, step=0.0001, value=0.500)
-
     submitted = st.form_submit_button("Submit")
     if submitted:
         compute(comment,thresh)
-
-# # INPUT TEXTBOX
-# comment = st.text_area('', "Drop your comment here! 😎")
-    
-# # IMPUT THRESHOLD
-# thresh = st.slider('Set the Threshold, default 0.5', 0.000, 1.000, step=0.0001, value=0.500)
-
 
 # sidebar
 st.sidebar.write("""
